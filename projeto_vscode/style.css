@@ -1,0 +1,39 @@
+body {
+    margin: 0;
+    background: #cceeff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: sans-serif;
+    position: relative;
+}
+
+canvas {
+    border: 2px solid #000;
+    background-color: #ffffff;
+}
+
+#gameOverScreen {
+    position: absolute;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    z-index: 10;
+}
+
+#gameOverScreen button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #ffcc00;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
