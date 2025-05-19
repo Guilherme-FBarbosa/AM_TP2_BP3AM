@@ -17,8 +17,8 @@ var runImage = undefined; // correndo
 // variáveis para rastreamento de frames:
 var frameIndex = 0; // Índice do frame atual
 var frameCount = 10; // Total de frames no spritesheet
-var frameWidth = 128; // Largura de cada frame
-var frameHeight = 128; // Altura de cada frame
+var frameWidth = 28; // Largura de cada frame
+var frameHeight = 67; // Altura de cada frame
 var frameDelay = 10; // Número de atualizações antes de mudar o frame
 var frameCounter = 0; // Contador para controlar o atraso
 
@@ -27,7 +27,7 @@ window.addEventListener("load", init, false);
 function init() {
   canvas = document.querySelector("canvas");
   drawingSurface = canvas.getContext("2d");
-  personagem = new Entity();
+  personagem = new Entity(28, 67);
   personagem.x = canvas.width / 2 - personagem.width / 2;
   personagem.y = canvas.height / 2 - personagem.height / 2;
   personagem.vx = 0;
@@ -107,18 +107,24 @@ function update() {
     case (personagem.vx !== 0 || personagem.vy !== 0) && isRunning:
       if (imagem !== runImage) {
         imagem = runImage; // Usa o spritesheet de Run
+        personagem.width = 54; // Ajusta a largura do personagem para o spritesheet de Run
+        personagem.height = 70; // Ajusta a altura do personagem para o spritesheet de Run
         frameIndex = 0; // Reinicia o índice do frame
       }
       break;
     case (personagem.vx !== 0 || personagem.vy !== 0):
       if (imagem !== walkImage) {
         imagem = walkImage; // Usa o spritesheet de Walk
+        personagem.width = 40; // Ajusta a largura do personagem para o spritesheet de Walk
+        personagem.height = 70; // Ajusta a altura do personagem para o spritesheet de Walk
         frameIndex = 0; // Reinicia o índice do frame
       }
       break;
     default:
       if (imagem !== idleImage) {
         imagem = idleImage; // Usa o spritesheet de Idle
+        personagem.width = 28; // Ajusta a largura do personagem para o spritesheet de Idle
+        personagem.height = 67; // Ajusta a altura do personagem para o spritesheet de Idle
         frameIndex = 0; // Reinicia o índice do frame
       }
       break;
@@ -131,13 +137,13 @@ function update() {
     frameDelay = 10;
   } else if (imagem === runImage) {
     frameCount = 10; // Total de frames no Run.png
-    frameWidth = 128;
-    frameHeight = 128;
+    frameWidth = 54;
+    frameHeight = 70;
     frameDelay = 10;
   } else if (imagem === idleImage) {
     frameCount = 6; // Total de frames no Idle.png
-    frameWidth = 128;
-    frameHeight = 128;
+    frameWidth = 28;
+    frameHeight = 67;
     frameDelay = 30;
   }
 

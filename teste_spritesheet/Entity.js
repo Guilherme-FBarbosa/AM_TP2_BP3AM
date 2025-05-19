@@ -5,14 +5,14 @@
 var Entity = Class.extend(function(){
   this.sprite={sourceX:0,
 			   sourceY:0,
-               sourceWidth:40,
+               sourceWidth:54,
                sourceHeight:70
 			  };
    
   this.x=0;
   this.y=0;
-  this.width= 40;
-  this.height= 70;
+  this.width;
+  this.height;
   this.alpha=1;
   this.shadow={	active:false,
 				shadowColor:"rgba(100, 100, 100, 0.5)",
@@ -26,7 +26,10 @@ var Entity = Class.extend(function(){
   this.vx=3;
   this.vy=3;
  
-  this.constructor= function(){};
+  this.constructor = function(width, height) {
+    this.width = width;
+    this.height = height;
+  };
   
   this.update=function(){};
   
