@@ -1,0 +1,204 @@
+var canvas;
+var drawingSurface;
+var sprites = [];
+
+// variáveis para o personagem:
+var personagem = undefined;
+var baseSpeed = 1;
+var isRunning = false; // flag para verificar se está correndo
+var facingRight = true; // indica se o personagem está virado para a direita
+
+// variáveis para a imagem do personagem:
+var imagem = undefined; // imagem do personagem
+var idleImage = undefined; // parado
+var walkImage = undefined; // andando
+var runImage = undefined; // correndo
+
+// variáveis para rastreamento de frames:
+var frameIndex = 0; // Índice do frame atual
+var frameCount = 10; // Total de frames no spritesheet
+var frameWidth = 128; // Largura de cada frame
+var frameHeight = 128; // Altura de cada frame
+var frameDelay = 10; // Número de atualizações antes de mudar o frame
+var frameCounter = 0; // Contador para controlar o atraso
+
+window.addEventListener("load", init, false);
+
+function init() {
+  canvas = document.querySelector("canvas");
+  drawingSurface = canvas.getContext("2d");
+  personagem = new Entity();
+  personagem.x = canvas.width / 2 - personagem.width / 2;
+  personagem.y = canvas.height / 2 - personagem.height / 2;
+  personagem.vx = 0;
+  personagem.vy = 0;
+  sprites.push(personagem);
+
+  idleImage = new Image();
+  idleImage.src = "assets/Idle.png";
+
+  walkImage = new Image();
+  walkImage.src = "assets/Walk.png";
+
+  runImage = new Image();
+  runImage.src = "assets/Run.png";
+
+  imagem = idleImage; // Inicialmente, a imagem é a de parado
+  imagem.addEventListener("load", loadHandler, false);
+}
+
+function loadHandler() {
+  // atualiza a entidade assim que a imagem é carregada
+  update();
+  window.addEventListener("keydown", keyDownHandler, false);
+  window.addEventListener("keyup", keyUpHandler, false);
+}
+
+function keyDownHandler(e) {
+  if (e.key == "ArrowRight") {
+    personagem.vx = baseSpeed;
+    facingRight = true;
+  } else if (e.key == "ArrowLeft") {
+    personagem.vx = -baseSpeed;
+    facingRight = false;
+  } else if (e.key == "ArrowUp") {
+    personagem.vy = -baseSpeed;
+  } else if (e.key == "ArrowDown") {
+    personagem.vy = baseSpeed;
+  }
+
+  if (e.key === "Shift") {
+    if (!isRunning) {
+      baseSpeed *= 2; // Dobra a velocidade base ao pressionar Shift
+      isRunning = true; // Define a flag de corrida
+      updateSpeed(); // Atualiza a velocidade do personagem
+    }
+  }
+}
+
+function keyUpHandler(e) {
+  if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+    personagem.vx = 0; // Para o movimento horizontal
+  } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+    personagem.vy = 0; // Para o movimento vertical
+  }
+
+  if (e.key === "Shift") {
+    if (isRunning) {
+      baseSpeed /= 2; // Restaura a velocidade base ao soltar Shift
+      isRunning = false; // Limpa a flag de corrida
+      updateSpeed(); // Atualiza a velocidade do personagem
+    }
+  }
+}
+
+function update() {
+  personagem.x += personagem.vx;
+  personagem.y += personagem.vy;
+
+  // Impede que o personagem saia do canvas
+  if (personagem.x < 0) personagem.x = 0;
+  if (personagem.y < 0) personagem.y = 0;
+  if (personagem.x + personagem.width > canvas.width) personagem.x = canvas.width - personagem.width;
+  if (personagem.y + personagem.height > canvas.height) personagem.y = canvas.height - personagem.height;
+
+  // Alterna entre Idle, Walk e Run com base no movimento e estado
+  switch (true) {
+    case (personagem.vx !== 0 || personagem.vy !== 0) && isRunning:
+      if (imagem !== runImage) {
+        imagem = runImage; // Usa o spritesheet de Run
+        frameIndex = 0; // Reinicia o índice do frame
+      }
+      break;
+    case (personagem.vx !== 0 || personagem.vy !== 0):
+      if (imagem !== walkImage) {
+        imagem = walkImage; // Usa o spritesheet de Walk
+        frameIndex = 0; // Reinicia o índice do frame
+      }
+      break;
+    default:
+      if (imagem !== idleImage) {
+        imagem = idleImage; // Usa o spritesheet de Idle
+        frameIndex = 0; // Reinicia o índice do frame
+      }
+      break;
+  }
+
+  if (imagem === walkImage) {
+    frameCount = 10; // Total de frames no Walk.png
+    frameWidth = 40;
+    frameHeight = 70;
+    frameDelay = 10;
+  } else if (imagem === runImage) {
+    frameCount = 10; // Total de frames no Run.png
+    frameWidth = 128;
+    frameHeight = 128;
+    frameDelay = 10;
+  } else if (imagem === idleImage) {
+    frameCount = 6; // Total de frames no Idle.png
+    frameWidth = 128;
+    frameHeight = 128;
+    frameDelay = 30;
+  }
+
+  // Atualiza o frame da animação
+  frameCounter++;
+  if (frameCounter >= frameDelay) {
+    frameCounter = 0;
+    frameIndex = (frameIndex + 1) % frameCount; // Atualiza o índice do frame
+  }
+
+  requestAnimationFrame(update, canvas);
+  render();
+}
+
+function updateSpeed() {
+  // Atualiza a velocidade do personagem com base na direção atual
+  if (personagem.vx > 0) {
+    personagem.vx = baseSpeed;
+  } else if (personagem.vx < 0) {
+    personagem.vx = -baseSpeed;
+  }
+
+  if (personagem.vy > 0) {
+    personagem.vy = baseSpeed;
+  } else if (personagem.vy < 0) {
+    personagem.vy = -baseSpeed;
+  }
+}
+
+function render() {
+  drawingSurface.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (sprites.length !== 0) {
+    for (var i = 0; i < sprites.length; i++) {
+      var entity = sprites[i];
+      if (entity.visible) {
+        drawingSurface.save(); // Salva o estado atual do contexto
+
+        if (!facingRight) {
+          // Espelha a imagem horizontalmente
+          drawingSurface.scale(-1, 1);
+          drawingSurface.drawImage(
+            imagem,
+            frameIndex * frameWidth, 0, // Posição do frame no spritesheet
+            frameWidth, frameHeight, // Tamanho do frame
+            -Math.floor(entity.x) - entity.width, Math.floor(entity.y), // Posição no canvas (invertida)
+            entity.width, entity.height // Tamanho no canvas
+          );
+        } else {
+          // Desenha normalmente
+          drawingSurface.drawImage(
+            imagem,
+            frameIndex * frameWidth, 0, // Posição do frame no spritesheet
+            frameWidth, frameHeight, // Tamanho do frame
+            Math.floor(entity.x), Math.floor(entity.y), // Posição no canvas
+            entity.width, entity.height // Tamanho no canvas
+          );
+        }
+
+        drawingSurface.restore(); // Restaura o estado do contexto
+      }
+    }
+  }
+}
