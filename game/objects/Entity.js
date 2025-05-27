@@ -2,13 +2,15 @@ var Entity = Class.extend(function () {
   this.sprite = {
     sourceX: 0,
     sourceY: 0,
-    sourceWidth: 54,
-    sourceHeight: 70
+    sourceWidth: 64,
+    sourceHeight: 64,
+    img: "",
+    imgURL: "",
   };
   this.x = 0;
   this.y = 0;
-  this.width;
-  this.height;
+  this.width = 64;
+  this.height = 64;
   this.alpha = 1;
   this.shadow = {
     active: false,
@@ -20,12 +22,16 @@ var Entity = Class.extend(function () {
   this.rotation = 0;
   this.visible = true;
 
-  this.vx = 3;
-  this.vy = 3;
+  this.vx = 0;
+  this.vy = 0;
 
-  this.constructor = function (width, height) {
+  this.constructor = function (width, height, spriteWidth, spriteHeight, img, imgURL) {
     this.width = width;
     this.height = height;
+    this.sprite.sourceWidth = spriteWidth
+    this.sprite.sourceHeight = spriteHeight
+    this.sprite.img = img
+    this.sprite.imgURL = imgURL
   };
 
   this.update = function () { };
