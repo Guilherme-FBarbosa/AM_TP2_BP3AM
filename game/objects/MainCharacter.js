@@ -1,9 +1,10 @@
 var MainCharacter = Entity.extend(function () {
 
-    this.constructor = function () {
+    this.constructor = function (state) {
         this.super();
+        this.state = state
     };
-
+    this.state = ''
     this.states = {
         IDLE: {
             sheetWidth: 768,
@@ -15,8 +16,6 @@ var MainCharacter = Entity.extend(function () {
             delay: 30,
             img: new Image(this.states.IDLE.sheetWidth, this.states.IDLE.sheetHeight),
             imgSource: '/assets/characters/main_character/Idle.png'
-
-
         },
         WALK: {
             sheetWidth: 1280,
@@ -40,7 +39,7 @@ var MainCharacter = Entity.extend(function () {
             img: new Image(this.states.RUN.sheetWidth, this.states.RUN.sheetHeight),
             imgSource: '/assets/characters/main_character/Run.png'
         },
-        ATTACK:{
+        ATTACK: {
             sheetWidth: 512,
             sheetHeight: 128,
             frames: 3, // começa no 0
@@ -60,8 +59,9 @@ var MainCharacter = Entity.extend(function () {
             currentFrame: 0,
             delay: 10,
             img: new Image(this.states.HURT.sheetWidth, this.states.HURT.sheetHeight),
-            imgSource: '/assets/characters/main_character/Hurt.png'},
-        DEAD:  {
+            imgSource: '/assets/characters/main_character/Hurt.png'
+        },
+        DEAD: {
             sheetWidth: 640,
             sheetHeight: 128,
             frames: 4, // começa no 0
@@ -70,14 +70,9 @@ var MainCharacter = Entity.extend(function () {
             currentFrame: 0,
             delay: 10,
             img: new Image(this.states.DEAD.sheetWidth, this.states.DEAD.sheetHeight),
-            imgSource: '/assets/characters/main_character/Hurt.png'}
-    }
-    this.update = function () { };
-    this.moveLeft = function () {
-        
-    }
-    this.moveRight = function () {
-        
+            imgSource: '/assets/characters/main_character/Dead.png'
+        }
     }
     
+
 })
