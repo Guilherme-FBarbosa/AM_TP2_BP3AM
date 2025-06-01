@@ -29,83 +29,112 @@ function init() {
     background.height = 1080;
     background.x = 0;
     background.y = 0;
-    background.sprite.img.addEventListener("load", onload)
 
     entities.push(background)
-    
-    
+
+
     gameWorld = new GameWorld(0, 0, background.width, background.height);
     
     camera = new Camera(0, 0, canvas.width, canvas.height);
-    
+
     camera.center(gameWorld);
-    
+    camera.keepWithinWorld(gameWorld)
+
     mainCharacter = new MainCharacter()
-    
     mainCharacter.state = mainCharacter.states.IDLE
+
+    // Center main character
     mainCharacter.x = (gameWorld.x + gameWorld.width / 2) - mainCharacter.state.sheetWidth / 2
     mainCharacter.y = (gameWorld.y + gameWorld.height / 2) - mainCharacter.state.sheetHeight / 2;
+
+    // Calculate frame width
     mainCharacter.state.frameWidth = (mainCharacter.state.sheetWidth / mainCharacter.state.frames)
     mainCharacter.state.frameX = (mainCharacter.state.currentFrame * mainCharacter.state.sheetWidth)
+
+    mainCharacter.width = mainCharacter.state.frameWidth
+    mainCharacter.height = mainCharacter.state.frameWidth
+
+    // Image of the main character
     mainCharacter.state.img = new Image(mainCharacter.state.sheetWidth, mainCharacter.state.sheetHeight)
     mainCharacter.state.img.src = mainCharacter.state.imgSource
-    mainCharacter.state.img.addEventListener("load", onload)
+
     entities.push(mainCharacter)
-    
+
+
+    mainCharacter.state.img.addEventListener("load", onload)
+    background.sprite.img.addEventListener("load", onload)
+
     window.addEventListener("keydown", keyDownHandler, false)
     window.addEventListener("keyup", keyUpHandler, false)
 }
 
-function onload(){
+function onload() {
     render()
+    gameCicle()
 }
 
 function keyDownHandler(e) {
-    keys[e.keyCode] = true
+    keys[e.code] = true
 }
 function keyUpHandler(e) {
-    keys[e.keyCode] = false
+    keys[e.code] = false
 }
 
 function update() {
-    mainCharacter.update(keys)
+    // Update position and frames
+    mainCharacter.update(keys, gameWorld)
 
-    //mover o gato e mante-lo dentro do mundo
-    mainCharacter.x = Math.max(0, Math.min(mainCharacter.x + mainCharacter.vx, gameWorld.width - mainCharacter.width));
-    mainCharacter.y = Math.max(0, Math.min(mainCharacter.y + mainCharacter.vy, gameWorld.height - mainCharacter.height));
-
-    //fazer scroll da camera
-    if (astroCat.x < camera.leftInnerBoundary())
-        camera.x = Math.floor(astroCat.x - (camera.width * 0.25));
-
-    if (astroCat.y < camera.topInnerBoundary())
-        camera.y = Math.floor(astroCat.y - (camera.height * 0.25));
-
-    if (astroCat.x + astroCat.width > camera.rightInnerBoundary())
-        camera.x = Math.floor(astroCat.x + astroCat.width - (camera.width * 0.75));
-
-    if (astroCat.y + astroCat.height > camera.bottomInnerBoundary())
-        camera.y = Math.floor(astroCat.y + astroCat.height - (camera.height * 0.75));
+    // Fazer scroll da camera
+    camera.scroll(mainCharacter)
 }
 
-function render(){
-    drawingSurface.clearRect(0,0,canvas.width, canvas.height)
+function gameCicle() {
+    update()
+    mainCharacter.updateFrames()
+    render()
+    requestAnimationFrame(gameCicle)
+}
+
+function render() {
+    drawingSurface.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Salva o estado do contexto antes de transladar
+    //drawingSurface.save();
+    // Translada o contexto para simular o movimento da câmara
+    //drawingSurface.translate(-camera.x, -camera.y);
+
     for (let i = 0; i < entities.length; i++) {
-        if(entities[i] instanceof MainCharacter){
-            console.log(entities[i].state)
-            drawingSurface.drawImage(entities[i].state.img, 
-                                    entities[i].state.frameX, 0,
-                                    entities[i].state.frameWidth, entities[i].state.frameWidth,
-                                    0,0,
-                                    entities[i].state.frameWidth, entities[i].state.frameWidth )
-        }else{
-            console.log(entities[i].sprite)
-            drawingSurface.drawImage(entities[i].sprite.img, 
-                                    entities[i].sprite.sourceX, entities[i].sprite.sourceY,
-                                    entities[i].sprite.sourceWidth, entities[i].sprite.sourceHeight,
-                                    0,0,
-                                    entities[i].sprite.sourceWidth, entities[i].sprite.sourceHeight )
+        const entity = entities[i];
+        if (entity instanceof MainCharacter) {
+            console.log(entity)
+            //const frameX = entity.state.currentFrame * entity.state.frameWidth;
+            drawingSurface.drawImage(
+                entity.state.img,
+                entity.state.frameX, 0,
+                entity.state.frameWidth, entity.state.frameWidth,
+                Math.floor(entity.x), Math.floor(entity.y),
+                entity.state.frameWidth, entity.state.frameWidth
+            );
+        } else {
+            console.log(entity)
+            drawingSurface.drawImage(
+                entity.sprite.img,
+                entity.sprite.sourceX, entity.sprite.sourceY,
+                entity.sprite.sourceWidth, entity.sprite.sourceHeight,
+                Math.floor(entity.x), Math.floor(entity.y),
+                entity.sprite.sourceWidth, entity.sprite.sourceHeight
+            );
         }
     }
+
+    // Desenha o frame da câmara (no mundo)
+    camera.drawFrame(drawingSurface, false);
+
+    // Restaura o contexto para desenhar elementos fixos no ecrã (UI, HUD, etc)
+    //drawingSurface.restore();
+
+    // Opcional: desenha o retângulo da viewport da câmara no canvas
+    drawingSurface.strokeStyle = "black";
+    drawingSurface.strokeRect(0, 0, camera.width, camera.height);
 }
 

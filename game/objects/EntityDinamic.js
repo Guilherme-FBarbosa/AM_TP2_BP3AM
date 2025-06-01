@@ -1,16 +1,5 @@
-var Entity = Class.extend(function () {
-  this.sprite = {
-    sourceX: 0,
-    sourceY: 0,
-    sourceWidth: 64,
-    sourceHeight: 64,
-    img: "",
-    src: "",
-  };
-  this.x = 0;
-  this.y = 0;
-  this.width = 64;
-  this.height = 64;
+var EntityDinamic = Class.extend(function () {
+
   this.alpha = 1;
   this.shadow = {
     active: false,
@@ -22,52 +11,64 @@ var Entity = Class.extend(function () {
   this.rotation = 0;
   this.visible = true;
 
-  this.vx = 0;
-  this.vy = 0;
+  this.x = 0;
+  this.y = 0;
 
-  this.constructor = function (width, height, spriteWidth, spriteHeight, img, src) {
-    this.width = width;
-    this.height = height;
-    this.sprite.sourceWidth = spriteWidth
-    this.sprite.sourceHeight = spriteHeight
-    this.sprite.img = img
-    this.sprite.src = src
+  this.constructor = function (vx = 0, vy = 0) {
+    this.vx = vx
+    this.vy = vy
   };
 
-  this.update = function (keys) {
-    switch (keys) {
+
+
+  this.update = function (keys, gameWorld) {
+    if (!keys) return
+
+    switch (true) {
       case keys['ArrowLeft'] && keys['ArrowUp']:
         this.vx = Math.abs(this.vx) * (-1)
         this.vy = Math.abs(this.vy) * (-1)
+        this.moveX(gameWorld)
+        this.moveY(gameWorld)
         break;
       case keys['ArrowLeft'] && keys['ArrowDown']:
         this.vx = Math.abs(this.vx) * (-1)
         this.vy = Math.abs(this.vy)
+        this.moveX(gameWorld)
+        this.moveY(gameWorld)
         break;
       case keys['ArrowRight'] && keys['ArrowUp']:
         this.vx = Math.abs(this.vx)
         this.vy = Math.abs(this.vy) * (-1)
+        this.moveX(gameWorld)
+        this.moveY(gameWorld)
         break;
       case keys['ArrowRight'] && keys['ArrowDown']:
         this.vx = Math.abs(this.vx)
         this.vy = Math.abs(this.vy)
+        this.moveX(gameWorld)
+        this.moveY(gameWorld)
         break;
       case keys['ArrowLeft']:
+        console.log("Left")
         this.vx = Math.abs(this.vx) * (-1)
+        this.moveX(gameWorld)
         break;
       case keys['ArrowRight']:
         this.vx = Math.abs(this.vx)
+        this.moveX(gameWorld)
         break;
       case keys['ArrowUp']:
         this.vy = Math.abs(this.vy) * (-1)
+        this.moveY(gameWorld)
         break;
       case keys['ArrowDown']:
         this.vy = Math.abs(this.vy)
+        this.moveY(gameWorld)
         break;
     }
-    this.moveX()
-    this.moveY()
   };
+
 
   this.scale = function (scale) {
     this.height += scale;
@@ -89,8 +90,10 @@ var Entity = Class.extend(function () {
 
   this.moveX = function (gameWorld) {
     this.x = Math.max(0, Math.min(this.x + this.vx, gameWorld.width - this.width));
+    console.log(this.x)
   }
-  this.moveY = function () {
+
+  this.moveY = function (gameWorld) {
     this.y = Math.max(0, Math.min(this.y + this.vy, gameWorld.height - this.height));
   }
 

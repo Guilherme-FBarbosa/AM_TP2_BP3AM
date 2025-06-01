@@ -1,4 +1,4 @@
-var Background = Entity.extend(function () {
+var Background = EntityStatic.extend(function () {
     
   this.constructor = function(){
    this.super(1920, 1080, 1920, 1080, "", "assets/backgrounds/City3.png");  
