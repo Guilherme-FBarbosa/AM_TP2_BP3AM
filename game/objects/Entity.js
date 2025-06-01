@@ -5,7 +5,7 @@ var Entity = Class.extend(function () {
     sourceWidth: 64,
     sourceHeight: 64,
     img: "",
-    imgURL: "",
+    src: "",
   };
   this.x = 0;
   this.y = 0;
@@ -25,13 +25,13 @@ var Entity = Class.extend(function () {
   this.vx = 0;
   this.vy = 0;
 
-  this.constructor = function (width, height, spriteWidth, spriteHeight, img, imgURL) {
+  this.constructor = function (width, height, spriteWidth, spriteHeight, img, src) {
     this.width = width;
     this.height = height;
     this.sprite.sourceWidth = spriteWidth
     this.sprite.sourceHeight = spriteHeight
     this.sprite.img = img
-    this.sprite.imgURL = imgURL
+    this.sprite.src = src
   };
 
   this.update = function (keys) {

@@ -19,8 +19,6 @@ window.addEventListener('load', init)
 
 function init() {
     canvas = document.getElementById("canvas")
-    console.log(window.innerWidth + "WIDTH")
-    console.log(window.innerHeight + "HEIGHT")
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
     drawingSurface = canvas.getContext("2d")
@@ -31,24 +29,35 @@ function init() {
     background.height = 1080;
     background.x = 0;
     background.y = 0;
+    background.sprite.img.addEventListener("load", onload)
+
     entities.push(background)
-
-
+    
+    
     gameWorld = new GameWorld(0, 0, background.width, background.height);
-
+    
     camera = new Camera(0, 0, canvas.width, canvas.height);
-
+    
     camera.center(gameWorld);
-
+    
     mainCharacter = new MainCharacter()
-
-    mainCharacter.x = (gameWorld.x + gameWorld.width / 2) - mainCharacter.width / 2
-    mainCharacter.y = (gameWorld.y + gameWorld.height / 2) - mainCharacter.height / 2;
-
+    
+    mainCharacter.state = mainCharacter.states.IDLE
+    mainCharacter.x = (gameWorld.x + gameWorld.width / 2) - mainCharacter.state.sheetWidth / 2
+    mainCharacter.y = (gameWorld.y + gameWorld.height / 2) - mainCharacter.state.sheetHeight / 2;
+    mainCharacter.state.frameWidth = (mainCharacter.state.sheetWidth / mainCharacter.state.frames)
+    mainCharacter.state.frameX = (mainCharacter.state.currentFrame * mainCharacter.state.sheetWidth)
+    mainCharacter.state.img = new Image(mainCharacter.state.sheetWidth, mainCharacter.state.sheetHeight)
+    mainCharacter.state.img.src = mainCharacter.state.imgSource
+    mainCharacter.state.img.addEventListener("load", onload)
     entities.push(mainCharacter)
-
+    
     window.addEventListener("keydown", keyDownHandler, false)
     window.addEventListener("keyup", keyUpHandler, false)
+}
+
+function onload(){
+    render()
 }
 
 function keyDownHandler(e) {
@@ -77,5 +86,26 @@ function update() {
 
     if (astroCat.y + astroCat.height > camera.bottomInnerBoundary())
         camera.y = Math.floor(astroCat.y + astroCat.height - (camera.height * 0.75));
+}
+
+function render(){
+    drawingSurface.clearRect(0,0,canvas.width, canvas.height)
+    for (let i = 0; i < entities.length; i++) {
+        if(entities[i] instanceof MainCharacter){
+            console.log(entities[i].state)
+            drawingSurface.drawImage(entities[i].state.img, 
+                                    entities[i].state.frameX, 0,
+                                    entities[i].state.frameWidth, entities[i].state.frameWidth,
+                                    0,0,
+                                    entities[i].state.frameWidth, entities[i].state.frameWidth )
+        }else{
+            console.log(entities[i].sprite)
+            drawingSurface.drawImage(entities[i].sprite.img, 
+                                    entities[i].sprite.sourceX, entities[i].sprite.sourceY,
+                                    entities[i].sprite.sourceWidth, entities[i].sprite.sourceHeight,
+                                    0,0,
+                                    entities[i].sprite.sourceWidth, entities[i].sprite.sourceHeight )
+        }
+    }
 }
 
