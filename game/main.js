@@ -34,7 +34,7 @@ function init() {
 
 
     gameWorld = new GameWorld(0, 0, background.width, background.height);
-    
+
     camera = new Camera(0, 0, canvas.width, canvas.height);
 
     camera.center(gameWorld);
@@ -43,13 +43,13 @@ function init() {
     mainCharacter = new MainCharacter()
     mainCharacter.state = mainCharacter.states.IDLE
 
-    // Center main character
-    mainCharacter.x = (gameWorld.x + gameWorld.width / 2) - mainCharacter.state.sheetWidth / 2
-    mainCharacter.y = (gameWorld.y + gameWorld.height / 2) - mainCharacter.state.sheetHeight / 2;
-
     // Calculate frame width
     mainCharacter.state.frameWidth = (mainCharacter.state.sheetWidth / mainCharacter.state.frames)
     mainCharacter.state.frameX = (mainCharacter.state.currentFrame * mainCharacter.state.sheetWidth)
+    // Center main character
+    mainCharacter.x = (gameWorld.x + gameWorld.width / 2) - mainCharacter.state.frameWidth / 2
+    mainCharacter.y = (gameWorld.y + gameWorld.height / 2) - mainCharacter.state.sheetHeight / 2;
+
 
     mainCharacter.width = mainCharacter.state.frameWidth
     mainCharacter.height = mainCharacter.state.frameWidth
@@ -83,7 +83,6 @@ function keyUpHandler(e) {
 function update() {
     // Update position and frames
     mainCharacter.update(keys, gameWorld)
-
     // Fazer scroll da camera
     camera.scroll(mainCharacter)
 }
@@ -99,9 +98,10 @@ function render() {
     drawingSurface.clearRect(0, 0, canvas.width, canvas.height);
 
     // Salva o estado do contexto antes de transladar
-    //drawingSurface.save();
+    drawingSurface.save();
     // Translada o contexto para simular o movimento da câmara
-    //drawingSurface.translate(-camera.x, -camera.y);
+    drawingSurface.translate(canvas.width / 2 - mainCharacter.x,
+        canvas.height / 2 - mainCharacter.y);
 
     for (let i = 0; i < entities.length; i++) {
         const entity = entities[i];
@@ -113,7 +113,7 @@ function render() {
                 entity.state.frameX, 0,
                 entity.state.frameWidth, entity.state.frameWidth,
                 Math.floor(entity.x), Math.floor(entity.y),
-                entity.state.frameWidth, entity.state.frameWidth
+                entity.state.frameWidth * 3, entity.state.frameWidth * 3
             );
         } else {
             console.log(entity)
@@ -131,7 +131,7 @@ function render() {
     camera.drawFrame(drawingSurface, false);
 
     // Restaura o contexto para desenhar elementos fixos no ecrã (UI, HUD, etc)
-    //drawingSurface.restore();
+    drawingSurface.restore();
 
     // Opcional: desenha o retângulo da viewport da câmara no canvas
     drawingSurface.strokeStyle = "black";

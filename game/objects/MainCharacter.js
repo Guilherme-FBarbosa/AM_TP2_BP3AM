@@ -11,8 +11,6 @@ var MainCharacter = EntityDinamic.extend(function () {
             sheetWidth: 768,
             sheetHeight: 128,
             currentFrame: 0,
-            characterWidth: 28 ,
-            characterHeight: 67,
             frames: 5, // começa no 0
             delay: 30,
             img: "",
@@ -22,8 +20,6 @@ var MainCharacter = EntityDinamic.extend(function () {
             sheetWidth: 1280,
             sheetHeight: 128,
             currentFrame: 0,
-            characterWidth: 40 ,
-            characterHeight: 70,
             frames: 9, // começa no 0
             delay: 10,
             img: "",
@@ -34,8 +30,6 @@ var MainCharacter = EntityDinamic.extend(function () {
             sheetHeight: 128,
             frames: 9, // começa no 0
             currentFrame: 0,
-            characterWidth: 54 ,
-            characterHeight: 70,
             delay: 10,
             img: "",
             imgSource: 'assets/characters/main_character/Run.png'
@@ -45,8 +39,6 @@ var MainCharacter = EntityDinamic.extend(function () {
             sheetHeight: 128,
             frames: 3, // começa no 0
             currentFrame: 0,
-            characterWidth: 28 ,
-            characterHeight: 67,
             delay: 10,
             img: "",
             imgSource: 'assets/characters/main_character/Attack.png'
@@ -56,8 +48,6 @@ var MainCharacter = EntityDinamic.extend(function () {
             sheetHeight: 128,
             frames: 2, // começa no 0
             currentFrame: 0,
-            characterWidth: 28 ,
-            characterHeight: 67,
             delay: 10,
             img: "",
             imgSource: 'assets/characters/main_character/Hurt.png'
@@ -67,8 +57,6 @@ var MainCharacter = EntityDinamic.extend(function () {
             sheetHeight: 128,
             frames: 4, // começa no 0
             currentFrame: 0,
-            characterWidth: 28 ,
-            characterHeight: 67,
             delay: 10,
             img: "",
             imgSource: 'assets/characters/main_character/Dead.png'
