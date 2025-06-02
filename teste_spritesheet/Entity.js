@@ -1,7 +1,3 @@
-/*
- Exercicio 4.4
- Entity.js
-*/
 var Entity = Class.extend(function () {
   this.sprite = {
     sourceX: 0,
