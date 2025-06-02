@@ -1,19 +1,32 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8" />
   <title>Jogo com Spritesheet</title>
   <script src="lib/extendjs/extend.min.js"></script>
-	<script src="lib/animation/requestAnimationFramePolyfill.js"></script>
-	<script src="Entity.js"></script>
-  <script src="teste.js"></script>
-  <style>
+  <script src="lib/animation/requestAnimationFramePolyfill.js"></script>
+  <script src="Entity.js"></script>
+  <script src="MovimentoPersonagem.js"></script>
+  <style> /* esse estilo server para remover as bordas do canvas e barras de rolagens do navegador */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
     canvas {
-      border: 1px solid black;
+      display: block;
+      border: none;
+      width: 100vw;
+      height: 100vh;
     }
   </style>
 </head>
+
 <body>
-  <canvas width="512" height="512"></canvas>
+  <canvas></canvas>
 </body>
+
 </html>
