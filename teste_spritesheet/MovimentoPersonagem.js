@@ -180,7 +180,6 @@ function keyDownHandler(e) {
     portaQuarto.abrir(); // Fecha a portaCorredor ao voltar para o quarto
     noCorredor ? personagem.x = 1270 : '' // Move o personagem para a esquerda
     // personagem.x = 1270; // Move o personagem para a esquerda
-
   }
 
   if (noCorredor && (e.key === "e" || e.key === "E") && personagemEmFrentePortaCorredor()) {
@@ -209,33 +208,7 @@ function keyUpHandler(e) {
     if (isRunning) {
       baseSpeed /= 4; // Restaura a velocidade base ao soltar Shift
       isRunning = false; // Limpa a flag de corrida
-
-      function keyUpHandler(e) {
-        if (!canMove) return;
-        if (e.code === "ArrowRight" || e.code === "ArrowLeft") {
-          personagem.vx = 0; // Para o movimento horizontal
-        }
-        if (e.code === "ShiftLeft") {
-          if (isRunning) {
-            baseSpeed /= 4; // Restaura a velocidade base ao soltar Shift
-            isRunning = false; // Limpa a flag de corrida
-            updateSpeed(); // Atualiza a velocidade do personagem
-          }
-        }
-      }
-    }
-  }
-  if (e.code === "ArrowUp") {
-    if (isAwakePlaying) {
-      // Se o personagem está acordando, não permite movimento
-      return;
-    }
-
-
-    // Gravity and jump logic
-    if (e.code === "ArrowUp" && !isJumping && !isAwakePlaying) {
-      isJumping = true;
-      velocityY = jumpStrength;
+      updateSpeed(); // Atualiza a velocidade do personagem
     }
   }
 }
