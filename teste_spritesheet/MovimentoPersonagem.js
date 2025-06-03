@@ -36,7 +36,7 @@ var isJumping = false;
 var gravity = 0.5;
 var velocityY = 0; // Começa parado
 var jumpStrength = -16; // Valor negativo para "subir"
-var groundY = 420; 
+var groundY = 420;
 
 var portaQuarto = new Porta(
   1515,
@@ -148,6 +148,12 @@ function keyDownHandler(e) {
       personagem.vx = -baseSpeed;
       facingRight = false
       break;
+    case "ArrowUp":
+      if (!isJumping && !isAwakePlaying) {
+        isJumping = true;
+        velocityY = jumpStrength;
+      }
+      break;
     default:
       break;
   }
@@ -218,12 +224,11 @@ function update() {
     personagem.x += personagem.vx;
     personagem.y += personagem.vy;
 
-     // Lógica do pulo
+    // Lógica de salto
     if (isJumping) {
       velocityY += gravity;
       personagem.y += velocityY;
 
-      // Chegou ao chão?
       if (personagem.y >= groundY) {
         personagem.y = groundY;
         velocityY = 0;
