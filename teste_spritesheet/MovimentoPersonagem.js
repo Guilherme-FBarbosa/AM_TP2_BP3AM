@@ -152,9 +152,6 @@ function keyDownHandler(e) {
       isRunning = true; // Define a flag de corrida
       updateSpeed(); // Atualiza a velocidade do personagem
     }
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
   }
 
   if (e.code === 'KeyE' && portaCorredor.personagemEmFrente(personagem, canvas) && noCorredor && !portaCorredor.aberta) {
@@ -178,8 +175,6 @@ function keyDownHandler(e) {
     portaQuarto.abrir(); // Fecha a portaCorredor ao voltar para o quarto
     noCorredor ? personagem.x = 1270 : '' // Move o personagem para a esquerda
     // personagem.x = 1270; // Move o personagem para a esquerda
-=======
-<<<<<<< HEAD
   }
 
   if (noCorredor && (e.key === "e" || e.key === "E") && personagemEmFrentePortaCorredor()) {
@@ -196,13 +191,11 @@ function keyDownHandler(e) {
       noCorredor = true;
       personagem.x = 1270; // Move o personagem para o centro da porta
     }
->>>>>>> 629ed8cd58ad8f68518f8e836f596f512faa2833
   }
 }
 
 function keyUpHandler(e) {
   if (!canMove) return;
-<<<<<<< HEAD
   if (e.code === "ArrowRight" || e.code === "ArrowLeft") {
     personagem.vx = 0; // Para o movimento horizontal
   }
@@ -210,9 +203,6 @@ function keyUpHandler(e) {
     if (isRunning) {
       baseSpeed /= 4; // Restaura a velocidade base ao soltar Shift
       isRunning = false; // Limpa a flag de corrida
-=======
-=======
->>>>>>> f0eda8b66d795d3d72b81daa48619b4d296ba06f
     
     function keyUpHandler(e) {
       if (!canMove) return;
@@ -223,11 +213,6 @@ function keyUpHandler(e) {
         if (isRunning) {
           baseSpeed /= 4; // Restaura a velocidade base ao soltar Shift
           isRunning = false; // Limpa a flag de corrida
-<<<<<<< HEAD
-=======
->>>>>>> 891bb5adac04b62c384db43700b8f62a8e5d0b32
->>>>>>> 629ed8cd58ad8f68518f8e836f596f512faa2833
->>>>>>> f0eda8b66d795d3d72b81daa48619b4d296ba06f
       updateSpeed(); // Atualiza a velocidade do personagem
     }
   }
@@ -518,8 +503,6 @@ function portaCorredorCanvasCoords() {
   };
 }
 
-<<<<<<< HEAD
-=======
 function personagemEmFrentePortaCorredor() {
   var portaCanvas = portaCorredorCanvasCoords();
   return (
@@ -535,11 +518,7 @@ function tocarSomPorta() {
   audio.currentTime = 0;
   audio.play();
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> 629ed8cd58ad8f68518f8e836f596f512faa2833
->>>>>>> f0eda8b66d795d3d72b81daa48619b4d296ba06f
 function changeBackgroundValues(spriteSourceY, spriteSourceWidth, spriteSourceHeight, width, height, x, y) {
   background.sprite.sourceY = spriteSourceY;
   background.sprite.sourceWidth = spriteSourceWidth;
@@ -548,4 +527,4 @@ function changeBackgroundValues(spriteSourceY, spriteSourceWidth, spriteSourceHe
   background.height = height;
   background.x = x;
   background.y = y;
-}
+}}}}
