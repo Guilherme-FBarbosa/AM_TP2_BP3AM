@@ -30,7 +30,7 @@ var frameHeight = 67; // Altura de cada frame
 var frameDelay = 80; // Número de atualizações antes de mudar o frame
 var frameCounter = 0; // Contador para controlar o atraso
 
-porta = new Porta(
+var portaQuarto = new Porta(
   1515,
   405,
   1839 - 1515,
@@ -39,14 +39,7 @@ porta = new Porta(
   1080
 );
 
-var portaCorredor = {
-  x: 1515,
-  y: 405,
-  width: 324,
-  height: 478,
-  bgOriginalWidth: 1920,
-  bgOriginalHeight: 1080
-};
+var portaCorredor = new Porta(1515, 405, 324, 478, 7550, 1020)
 
 window.addEventListener("load", init, false);
 window.addEventListener("resize", resizeCanvas); // Redimensiona também o canvas ao redimensionar a janela
@@ -124,43 +117,50 @@ function keyDownHandler(e) {
       personagem.vx = -baseSpeed;
       facingRight = false
       break;
-      default:
-        break;
-      }
-      if (e.code === 'ShiftLeft') {
-        if (!isRunning) {
-          baseSpeed *= 4; // Dobra a velocidade base ao pressionar Shift
-          isRunning = true; // Define a flag de corrida
-          updateSpeed(); // Atualiza a velocidade do personagem
-        }
-      }
-      
-      if (noCorredor && (e.code === "KeyE") && personagemEmFrentePortaCorredor()) {
-        noCorredor = false;
-        porta.aberta = false; // Fecha a porta ao voltar para o quarto
-        return;
-      }
-      
-      if (e.code === "KeyE") {
-        if (porta.personagemEmFrente(personagem, canvas)) {
-          porta.abrir();
-          // Troca o fundo e move o personagem
-          noCorredor = !noCorredor;
-          noCorredor ? personagem.x = 1270 : '' // Move o personagem para a esquerda
-          // personagem.x = 1270; // Move o personagem para a esquerda
-        }
-      }
+    default:
+      break;
+  }
+  if (e.code === 'ShiftLeft') {
+    if (!isRunning) {
+      baseSpeed *= 4; // Dobra a velocidade base ao pressionar Shift
+      isRunning = true; // Define a flag de corrida
+      updateSpeed(); // Atualiza a velocidade do personagem
     }
-    
-    function keyUpHandler(e) {
-      if (!canMove) return;
-      if (e.code === "ArrowRight" || e.code === "ArrowLeft") {
-        personagem.vx = 0; // Para o movimento horizontal
-      }
-      if (e.code === "ShiftLeft") {
-        if (isRunning) {
-          baseSpeed /= 4; // Restaura a velocidade base ao soltar Shift
-          isRunning = false; // Limpa a flag de corrida
+  }
+
+  if (e.code === 'KeyE' && portaCorredor.personagemEmFrente(personagem, canvas) && noCorredor && !portaCorredor.aberta) {
+    noCorredor = false;
+    portaQuarto.aberta = false; // Fecha a portaQuarto ao voltar para o quarto
+    portaCorredor.abrir(); // Fecha a portaCorredor ao voltar para o quarto
+    return;
+  }
+  
+  // if (noCorredor && (e.code === "KeyE") && personagemEmFrentePortaCorredor()) {
+  //   noCorredor = false;
+  //   portaQuarto.aberta = false; // Fecha a portaQuarto ao voltar para o quarto
+  //   return;
+  // }
+  
+  if (e.code === "KeyE" && portaQuarto.personagemEmFrente(personagem, canvas) && !noCorredor && !portaQuarto.aberta) {
+    portaQuarto.abrir();
+    // Troca o fundo e move o personagem
+    noCorredor = true;
+    portaCorredor.aberta = false; // Fecha a portaQuarto ao voltar para o quarto
+    portaQuarto.abrir(); // Fecha a portaCorredor ao voltar para o quarto
+    noCorredor ? personagem.x = 1270 : '' // Move o personagem para a esquerda
+    // personagem.x = 1270; // Move o personagem para a esquerda
+  }
+}
+
+function keyUpHandler(e) {
+  if (!canMove) return;
+  if (e.code === "ArrowRight" || e.code === "ArrowLeft") {
+    personagem.vx = 0; // Para o movimento horizontal
+  }
+  if (e.code === "ShiftLeft") {
+    if (isRunning) {
+      baseSpeed /= 4; // Restaura a velocidade base ao soltar Shift
+      isRunning = false; // Limpa a flag de corrida
       updateSpeed(); // Atualiza a velocidade do personagem
     }
   }
@@ -346,12 +346,12 @@ function render() {
     }
   }
 
-  // Desenha o botão "E" se o personagem estiver em frente à porta
-  if (porta.personagemEmFrente(personagem, canvas) && !porta.aberta) {
-    // Posição central da porta (ajuste se quiser)
-    var portaCoords = porta.getCanvasCoords(canvas);
+  // Desenha o botão "E" se o personagem estiver em frente à portaQuarto
+  if (portaQuarto.personagemEmFrente(personagem, canvas) && !portaQuarto.aberta) {
+    // Posição central da portaQuarto (ajuste se quiser)
+    var portaCoords = portaQuarto.getCanvasCoords(canvas);
     var centerX = portaCoords.x + portaCoords.width / 2;
-    var centerY = portaCoords.y - 40; // um pouco acima da porta
+    var centerY = portaCoords.y - 40; // um pouco acima da portaQuarto
 
     // Animação de flutuação
     var floatOffset = Math.sin(Date.now() / 400) * 10;
@@ -430,6 +430,11 @@ function resizeCanvas() {
   canvas.height = window.innerHeight;
 }
 
+function personagemEmFrentePortaCorredor() {
+  var portaCanvas = portaCorredorCanvasCoords();
+
+}
+
 function portaCorredorCanvasCoords() {
   var scaleX = canvas.width / portaCorredor.bgOriginalWidth;
   var scaleY = canvas.height / portaCorredor.bgOriginalHeight;
@@ -441,10 +446,6 @@ function portaCorredorCanvasCoords() {
   };
 }
 
-function personagemEmFrentePortaCorredor() {
-  var portaCanvas = portaCorredorCanvasCoords();
-
-}
 function changeBackgroundValues(spriteSourceY, spriteSourceWidth, spriteSourceHeight, width, height, x, y) {
   background.sprite.sourceY = spriteSourceY;
   background.sprite.sourceWidth = spriteSourceWidth;
