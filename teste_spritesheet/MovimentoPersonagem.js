@@ -39,6 +39,15 @@ porta = new Porta(
   1080
 );
 
+var portaCorredor = {
+  x: 1515,
+  y: 405,
+  width: 324,
+  height: 478,
+  bgOriginalWidth: 1920,
+  bgOriginalHeight: 1080
+};
+
 window.addEventListener("load", init, false);
 window.addEventListener("resize", resizeCanvas); // Redimensiona também o canvas ao redimensionar a janela
 
@@ -90,11 +99,7 @@ function keyDownHandler(e) {
   } else if (e.key == "ArrowLeft") {
     personagem.vx = -baseSpeed;
     facingRight = false;
-  } // else if (e.key == "ArrowUp") {
-  //   personagem.vy = -baseSpeed;
-  // } else if (e.key == "ArrowDown") {
-  //   personagem.vy = baseSpeed;
-  // }
+  }
 
   if (e.key === "Shift") {
     if (!isRunning) {
@@ -104,23 +109,29 @@ function keyDownHandler(e) {
     }
   }
 
+  if (noCorredor && (e.key === "e" || e.key === "E") && personagemEmFrentePortaCorredor()) {
+    noCorredor = false;
+    porta.aberta = false; // Fecha a porta ao voltar para o quarto
+    return;
+  }
+
   if (e.key === "e" || e.key === "E") {
     if (porta.personagemEmFrente(personagem, canvas) && !porta.aberta) {
       porta.abrir();
       // Troca o fundo e move o personagem
       noCorredor = true;
-      personagem.x = 0; // Move o personagem para a esquerda
+      personagem.x = 1270; // Move o personagem para a esquerda
     }
   }
+
+
 }
 
 function keyUpHandler(e) {
   if (!canMove) return;
   if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
     personagem.vx = 0; // Para o movimento horizontal
-  } // else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-  //   personagem.vy = 0; // Para o movimento vertical
-  // }
+  }
 
   if (e.key === "Shift") {
     if (isRunning) {
@@ -350,10 +361,66 @@ function render() {
     drawingSurface.fillText("E", centerX, centerY + floatOffset);
     drawingSurface.restore();
   }
+
+  // Botão "E" para voltar ao quarto
+  if (noCorredor && personagemEmFrentePortaCorredor()) {
+    var portaCoords = portaCorredorCanvasCoords();
+    var centerX = portaCoords.x + portaCoords.width / 2;
+    var centerY = portaCoords.y - 40;
+    var floatOffset = Math.sin(Date.now() / 400) * 10;
+
+    drawingSurface.save();
+    drawingSurface.globalAlpha = 0.9;
+    drawingSurface.beginPath();
+    var width = 50, height = 50, radius = 10;
+    drawingSurface.moveTo(centerX - width / 2 + radius, centerY + floatOffset - height / 2);
+    drawingSurface.lineTo(centerX + width / 2 - radius, centerY + floatOffset - height / 2);
+    drawingSurface.quadraticCurveTo(centerX + width / 2, centerY + floatOffset - height / 2, centerX + width / 2, centerY + floatOffset - height / 2 + radius);
+    drawingSurface.lineTo(centerX + width / 2, centerY + floatOffset + height / 2 - radius);
+    drawingSurface.quadraticCurveTo(centerX + width / 2, centerY + floatOffset + height / 2, centerX + width / 2 - radius, centerY + floatOffset + height / 2);
+    drawingSurface.lineTo(centerX - width / 2 + radius, centerY + floatOffset + height / 2);
+    drawingSurface.quadraticCurveTo(centerX - width / 2, centerY + floatOffset + height / 2, centerX - width / 2, centerY + floatOffset + height / 2 - radius);
+    drawingSurface.lineTo(centerX - width / 2, centerY + floatOffset - height / 2 + radius);
+    drawingSurface.quadraticCurveTo(centerX - width / 2, centerY + floatOffset - height / 2, centerX - width / 2 + radius, centerY + floatOffset - height / 2);
+    drawingSurface.closePath();
+    drawingSurface.fillStyle = "#fff";
+    drawingSurface.strokeStyle = "#000";
+    drawingSurface.lineWidth = 2;
+    drawingSurface.fill();
+    drawingSurface.stroke();
+
+    drawingSurface.fillStyle = "#000";
+    drawingSurface.font = "bold 30px Arial";
+    drawingSurface.textAlign = "center";
+    drawingSurface.textBaseline = "middle";
+    drawingSurface.fillText("E", centerX, centerY + floatOffset);
+    drawingSurface.restore();
+  }
 }
 
 // Redimensiona o canvas para ocupar toda a janela
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+}
+
+function portaCorredorCanvasCoords() {
+  var scaleX = canvas.width / portaCorredor.bgOriginalWidth;
+  var scaleY = canvas.height / portaCorredor.bgOriginalHeight;
+  return {
+    x: portaCorredor.x * scaleX,
+    y: portaCorredor.y * scaleY,
+    width: portaCorredor.width * scaleX,
+    height: portaCorredor.height * scaleY
+  };
+}
+
+function personagemEmFrentePortaCorredor() {
+  var portaCanvas = portaCorredorCanvasCoords();
+  return (
+    personagem.x + personagem.width > portaCanvas.x &&
+    personagem.x < portaCanvas.x + portaCanvas.width &&
+    personagem.y + personagem.height > portaCanvas.y &&
+    personagem.y < portaCanvas.y + portaCanvas.height
+  );
 }

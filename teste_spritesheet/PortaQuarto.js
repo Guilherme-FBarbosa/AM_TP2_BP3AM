@@ -40,7 +40,5 @@ var Porta = Class.extend(function () {
 
   this.abrir = function () {
     this.aberta = true;
-    // Aqui você pode adicionar efeitos, sons, etc.
-    alert("A porta foi aberta!");
   };
 });
