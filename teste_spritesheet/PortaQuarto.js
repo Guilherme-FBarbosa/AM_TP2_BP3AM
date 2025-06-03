@@ -40,5 +40,6 @@ var Porta = Class.extend(function () {
 
   this.abrir = function () {
     this.aberta = true;
+    tocarSomPorta();
   };
 });

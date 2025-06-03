@@ -6,6 +6,9 @@ imagemQuartoBackground.src = "assets/quarto_background.png"; // Imagem de fundo 
 var imagemCorredorBackground = new Image();
 imagemCorredorBackground.src = "assets/corredor_background.png"; // Imagem de fundo do corredor
 
+var slidePuzzle = new SlidePuzzle(3);
+var puzzleActive = true;
+
 // variáveis para o personagem:
 var personagem = undefined;
 var baseSpeed = 1.5; // velocidade base do personagem
@@ -89,6 +92,29 @@ function init() {
     window.addEventListener("keyup", keyUpHandler, false);
     requestAnimationFrame(update);
   }, false);
+
+  canvas.addEventListener("mousedown", function(e) {
+    if (puzzleActive) {
+      var rect = canvas.getBoundingClientRect();
+      slidePuzzle.handleMouseDown(e.clientX - rect.left, e.clientY - rect.top);
+    }
+  });
+  canvas.addEventListener("mouseup", function(e) {
+    if (puzzleActive) {
+      var rect = canvas.getBoundingClientRect();
+      slidePuzzle.handleMouseUp(e.clientX - rect.left, e.clientY - rect.top);
+      if (slidePuzzle.solved) {
+        puzzleActive = false;
+        canMove = true;
+      }
+    }
+  });
+  canvas.addEventListener("mousemove", function(e) {
+    if (puzzleActive) {
+      var rect = canvas.getBoundingClientRect();
+      slidePuzzle.handleMouseMove(e.clientX - rect.left, e.clientY - rect.top);
+    }
+  });
 }
 
 function keyDownHandler(e) {
@@ -110,6 +136,7 @@ function keyDownHandler(e) {
   }
 
   if (noCorredor && (e.key === "e" || e.key === "E") && personagemEmFrentePortaCorredor()) {
+    tocarSomPorta();
     noCorredor = false;
     porta.aberta = false; // Fecha a porta ao voltar para o quarto
     return;
@@ -120,11 +147,9 @@ function keyDownHandler(e) {
       porta.abrir();
       // Troca o fundo e move o personagem
       noCorredor = true;
-      personagem.x = 1270; // Move o personagem para a esquerda
+      personagem.x = 1270; // Move o personagem para o centro da porta
     }
   }
-
-
 }
 
 function keyUpHandler(e) {
@@ -271,6 +296,11 @@ function updateSpeed() {
 }
 
 function render() {
+  // if (puzzleActive) {
+  //   slidePuzzle.render(drawingSurface, canvas);
+  //   return;
+  // }
+
   // desativa o smoothing (antisserrilhamento) do canvas, já que estamos lidando com sprites e pixel arts
   drawingSurface.imageSmoothingEnabled = false;
 
@@ -423,4 +453,10 @@ function personagemEmFrentePortaCorredor() {
     personagem.y + personagem.height > portaCanvas.y &&
     personagem.y < portaCanvas.y + portaCanvas.height
   );
+}
+
+function tocarSomPorta() {
+  var audio = document.getElementById("doorSound");
+  audio.currentTime = 0;
+  audio.play();
 }
