@@ -177,37 +177,6 @@ function keyDownHandler(e) {
         }
       }
     }
-<<<<<<< HEAD
-  }
-
-  if (noCorredor && (e.key === "e" || e.key === "E") && personagemEmFrentePortaCorredor()) {
-    tocarSomPorta();
-    noCorredor = false;
-    porta.aberta = false; // Fecha a porta ao voltar para o quarto
-    return;
-  }
-
-  if (e.key === "e" || e.key === "E") {
-    if (porta.personagemEmFrente(personagem, canvas) && !porta.aberta) {
-      porta.abrir();
-      // Troca o fundo e move o personagem
-      noCorredor = true;
-      personagem.x = 1270; // Move o personagem para o centro da porta
-    }
-  }
-}
-
-function keyUpHandler(e) {
-  if (!canMove) return;
-  if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-    personagem.vx = 0; // Para o movimento horizontal
-  }
-
-  if (e.key === "Shift") {
-    if (isRunning) {
-      baseSpeed /= 2; // Restaura a velocidade base ao soltar Shift
-      isRunning = false; // Limpa a flag de corrida
-=======
     
     function keyUpHandler(e) {
       if (!canMove) return;
@@ -218,7 +187,6 @@ function keyUpHandler(e) {
         if (isRunning) {
           baseSpeed /= 4; // Restaura a velocidade base ao soltar Shift
           isRunning = false; // Limpa a flag de corrida
->>>>>>> 891bb5adac04b62c384db43700b8f62a8e5d0b32
       updateSpeed(); // Atualiza a velocidade do personagem
     }
   }
@@ -506,7 +474,6 @@ function portaCorredorCanvasCoords() {
 
 function personagemEmFrentePortaCorredor() {
   var portaCanvas = portaCorredorCanvasCoords();
-<<<<<<< HEAD
   return (
     personagem.x + personagem.width > portaCanvas.x &&
     personagem.x < portaCanvas.x + portaCanvas.width &&
@@ -519,9 +486,8 @@ function tocarSomPorta() {
   var audio = document.getElementById("doorSound");
   audio.currentTime = 0;
   audio.play();
-=======
-
 }
+
 function changeBackgroundValues(spriteSourceY, spriteSourceWidth, spriteSourceHeight, width, height, x, y) {
   background.sprite.sourceY = spriteSourceY;
   background.sprite.sourceWidth = spriteSourceWidth;
@@ -530,5 +496,4 @@ function changeBackgroundValues(spriteSourceY, spriteSourceWidth, spriteSourceHe
   background.height = height;
   background.x = x;
   background.y = y;
->>>>>>> 891bb5adac04b62c384db43700b8f62a8e5d0b32
 }
