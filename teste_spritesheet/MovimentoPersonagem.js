@@ -6,6 +6,9 @@ imagemQuartoBackground.src = "assets/quarto_background.png"; // Imagem de fundo 
 var imagemCorredorBackground = new Image();
 imagemCorredorBackground.src = "assets/corredor_background.png"; // Imagem de fundo do corredor
 
+var slidePuzzle = new SlidePuzzle(3);
+var puzzleActive = true;
+
 // variáveis para o personagem:
 var personagem = undefined;
 var baseSpeed = 1.5; // velocidade base do personagem
@@ -103,6 +106,29 @@ function init() {
     window.addEventListener("keyup", keyUpHandler, false);
     requestAnimationFrame(update);
   }, false);
+
+  canvas.addEventListener("mousedown", function(e) {
+    if (puzzleActive) {
+      var rect = canvas.getBoundingClientRect();
+      slidePuzzle.handleMouseDown(e.clientX - rect.left, e.clientY - rect.top);
+    }
+  });
+  canvas.addEventListener("mouseup", function(e) {
+    if (puzzleActive) {
+      var rect = canvas.getBoundingClientRect();
+      slidePuzzle.handleMouseUp(e.clientX - rect.left, e.clientY - rect.top);
+      if (slidePuzzle.solved) {
+        puzzleActive = false;
+        canMove = true;
+      }
+    }
+  });
+  canvas.addEventListener("mousemove", function(e) {
+    if (puzzleActive) {
+      var rect = canvas.getBoundingClientRect();
+      slidePuzzle.handleMouseMove(e.clientX - rect.left, e.clientY - rect.top);
+    }
+  });
 }
 
 function keyDownHandler(e) {
@@ -126,6 +152,7 @@ function keyDownHandler(e) {
       isRunning = true; // Define a flag de corrida
       updateSpeed(); // Atualiza a velocidade do personagem
     }
+<<<<<<< HEAD
   }
 
   if (e.code === 'KeyE' && portaCorredor.personagemEmFrente(personagem, canvas) && noCorredor && !portaCorredor.aberta) {
@@ -149,11 +176,31 @@ function keyDownHandler(e) {
     portaQuarto.abrir(); // Fecha a portaCorredor ao voltar para o quarto
     noCorredor ? personagem.x = 1270 : '' // Move o personagem para a esquerda
     // personagem.x = 1270; // Move o personagem para a esquerda
+=======
+<<<<<<< HEAD
+  }
+
+  if (noCorredor && (e.key === "e" || e.key === "E") && personagemEmFrentePortaCorredor()) {
+    tocarSomPorta();
+    noCorredor = false;
+    porta.aberta = false; // Fecha a porta ao voltar para o quarto
+    return;
+  }
+
+  if (e.key === "e" || e.key === "E") {
+    if (porta.personagemEmFrente(personagem, canvas) && !porta.aberta) {
+      porta.abrir();
+      // Troca o fundo e move o personagem
+      noCorredor = true;
+      personagem.x = 1270; // Move o personagem para o centro da porta
+    }
+>>>>>>> 629ed8cd58ad8f68518f8e836f596f512faa2833
   }
 }
 
 function keyUpHandler(e) {
   if (!canMove) return;
+<<<<<<< HEAD
   if (e.code === "ArrowRight" || e.code === "ArrowLeft") {
     personagem.vx = 0; // Para o movimento horizontal
   }
@@ -161,6 +208,20 @@ function keyUpHandler(e) {
     if (isRunning) {
       baseSpeed /= 4; // Restaura a velocidade base ao soltar Shift
       isRunning = false; // Limpa a flag de corrida
+=======
+=======
+    
+    function keyUpHandler(e) {
+      if (!canMove) return;
+      if (e.code === "ArrowRight" || e.code === "ArrowLeft") {
+        personagem.vx = 0; // Para o movimento horizontal
+      }
+      if (e.code === "ShiftLeft") {
+        if (isRunning) {
+          baseSpeed /= 4; // Restaura a velocidade base ao soltar Shift
+          isRunning = false; // Limpa a flag de corrida
+>>>>>>> 891bb5adac04b62c384db43700b8f62a8e5d0b32
+>>>>>>> 629ed8cd58ad8f68518f8e836f596f512faa2833
       updateSpeed(); // Atualiza a velocidade do personagem
     }
   }
@@ -289,6 +350,11 @@ function updateSpeed() {
 }
 
 function render() {
+  // if (puzzleActive) {
+  //   slidePuzzle.render(drawingSurface, canvas);
+  //   return;
+  // }
+
   // desativa o smoothing (antisserrilhamento) do canvas, já que estamos lidando com sprites e pixel arts
   drawingSurface.clearRect(0, 0, canvas.width, canvas.height);
   drawingSurface.save();
@@ -446,6 +512,27 @@ function portaCorredorCanvasCoords() {
   };
 }
 
+<<<<<<< HEAD
+=======
+function personagemEmFrentePortaCorredor() {
+  var portaCanvas = portaCorredorCanvasCoords();
+<<<<<<< HEAD
+  return (
+    personagem.x + personagem.width > portaCanvas.x &&
+    personagem.x < portaCanvas.x + portaCanvas.width &&
+    personagem.y + personagem.height > portaCanvas.y &&
+    personagem.y < portaCanvas.y + portaCanvas.height
+  );
+}
+
+function tocarSomPorta() {
+  var audio = document.getElementById("doorSound");
+  audio.currentTime = 0;
+  audio.play();
+=======
+
+}
+>>>>>>> 629ed8cd58ad8f68518f8e836f596f512faa2833
 function changeBackgroundValues(spriteSourceY, spriteSourceWidth, spriteSourceHeight, width, height, x, y) {
   background.sprite.sourceY = spriteSourceY;
   background.sprite.sourceWidth = spriteSourceWidth;
@@ -454,4 +541,5 @@ function changeBackgroundValues(spriteSourceY, spriteSourceWidth, spriteSourceHe
   background.height = height;
   background.x = x;
   background.y = y;
+>>>>>>> 891bb5adac04b62c384db43700b8f62a8e5d0b32
 }
