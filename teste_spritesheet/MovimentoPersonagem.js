@@ -73,6 +73,27 @@ function init() {
   runImage = new Image();
   runImage.src = "assets/Run.png";
 
+
+
+  background = new Entity();
+  background.sprite.sourceY = 64;
+  background.sprite.sourceWidth = 1920;
+  background.sprite.sourceHeight = 1020;
+  background.width = 1920;
+  background.height = 1020;
+  background.x = 0;
+  background.y = 0;
+
+
+
+  gameWorld = new GameWorld(0, 0, background.width, background.height);
+
+  camera = new Camera(0, 0, canvas.width, canvas.height);
+  camera.center(gameWorld);
+
+
+
+
   // Começa com a animação de acordar
   imagem = awakeImage;
   frameCount = 5;
@@ -92,51 +113,54 @@ function init() {
 }
 
 function keyDownHandler(e) {
+  if (e.repeat) return;
   if (!canMove) return;
-  if (e.key == "ArrowRight") {
-    personagem.vx = baseSpeed;
-    facingRight = true;
-  } else if (e.key == "ArrowLeft") {
-    personagem.vx = -baseSpeed;
-    facingRight = false;
-  }
-
-  if (e.key === "Shift") {
-    if (!isRunning) {
-      baseSpeed *= 2; // Dobra a velocidade base ao pressionar Shift
-      isRunning = true; // Define a flag de corrida
-      updateSpeed(); // Atualiza a velocidade do personagem
+  switch (e.code) {
+    case 'ArrowRight':
+      personagem.vx = baseSpeed;
+      facingRight = true;
+      break;
+    case 'ArrowLeft':
+      personagem.vx = -baseSpeed;
+      facingRight = false
+      break;
+      default:
+        break;
+      }
+      if (e.code === 'ShiftLeft') {
+        if (!isRunning) {
+          baseSpeed *= 4; // Dobra a velocidade base ao pressionar Shift
+          isRunning = true; // Define a flag de corrida
+          updateSpeed(); // Atualiza a velocidade do personagem
+        }
+      }
+      
+      if (noCorredor && (e.code === "KeyE") && personagemEmFrentePortaCorredor()) {
+        noCorredor = false;
+        porta.aberta = false; // Fecha a porta ao voltar para o quarto
+        return;
+      }
+      
+      if (e.code === "KeyE") {
+        if (porta.personagemEmFrente(personagem, canvas)) {
+          porta.abrir();
+          // Troca o fundo e move o personagem
+          noCorredor = !noCorredor;
+          noCorredor ? personagem.x = 1270 : '' // Move o personagem para a esquerda
+          // personagem.x = 1270; // Move o personagem para a esquerda
+        }
+      }
     }
-  }
-
-  if (noCorredor && (e.key === "e" || e.key === "E") && personagemEmFrentePortaCorredor()) {
-    noCorredor = false;
-    porta.aberta = false; // Fecha a porta ao voltar para o quarto
-    return;
-  }
-
-  if (e.key === "e" || e.key === "E") {
-    if (porta.personagemEmFrente(personagem, canvas) && !porta.aberta) {
-      porta.abrir();
-      // Troca o fundo e move o personagem
-      noCorredor = true;
-      personagem.x = 1270; // Move o personagem para a esquerda
-    }
-  }
-
-
-}
-
-function keyUpHandler(e) {
-  if (!canMove) return;
-  if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-    personagem.vx = 0; // Para o movimento horizontal
-  }
-
-  if (e.key === "Shift") {
-    if (isRunning) {
-      baseSpeed /= 2; // Restaura a velocidade base ao soltar Shift
-      isRunning = false; // Limpa a flag de corrida
+    
+    function keyUpHandler(e) {
+      if (!canMove) return;
+      if (e.code === "ArrowRight" || e.code === "ArrowLeft") {
+        personagem.vx = 0; // Para o movimento horizontal
+      }
+      if (e.code === "ShiftLeft") {
+        if (isRunning) {
+          baseSpeed /= 4; // Restaura a velocidade base ao soltar Shift
+          isRunning = false; // Limpa a flag de corrida
       updateSpeed(); // Atualiza a velocidade do personagem
     }
   }
@@ -262,27 +286,28 @@ function updateSpeed() {
   } else if (personagem.vx < 0) {
     personagem.vx = -baseSpeed;
   }
-
-  if (personagem.vy > 0) {
-    personagem.vy = baseSpeed;
-  } else if (personagem.vy < 0) {
-    personagem.vy = -baseSpeed;
-  }
 }
 
 function render() {
   // desativa o smoothing (antisserrilhamento) do canvas, já que estamos lidando com sprites e pixel arts
+  drawingSurface.clearRect(0, 0, canvas.width, canvas.height);
+  drawingSurface.save();
+
   drawingSurface.imageSmoothingEnabled = false;
+
+  // drawingSurface.translate(-camera.x, -camera.y);
 
   // Troca o fundo conforme a flag
   if (noCorredor) {
     if (imagemCorredorBackground.complete) {
+      changeBackgroundValues(0, 7550, 1020, 7550, 1020, 0, 0)
       drawingSurface.drawImage(imagemCorredorBackground, 0, 0, canvas.width, canvas.height);
     } else {
       drawingSurface.clearRect(0, 0, canvas.width, canvas.height);
     }
   } else {
     if (imagemQuartoBackground.complete) {
+      changeBackgroundValues(0, 1920, 1020, 1920, 1020, 0, 0)
       drawingSurface.drawImage(imagemQuartoBackground, 0, 0, canvas.width, canvas.height);
     } else {
       drawingSurface.clearRect(0, 0, canvas.width, canvas.height);
@@ -316,7 +341,6 @@ function render() {
             entity.width, entity.height // Tamanho no canvas
           );
         }
-
         drawingSurface.restore(); // Restaura o estado do contexto
       }
     }
@@ -396,6 +420,8 @@ function render() {
     drawingSurface.fillText("E", centerX, centerY + floatOffset);
     drawingSurface.restore();
   }
+  camera.drawFrame(drawingSurface, true)
+
 }
 
 // Redimensiona o canvas para ocupar toda a janela
@@ -417,10 +443,14 @@ function portaCorredorCanvasCoords() {
 
 function personagemEmFrentePortaCorredor() {
   var portaCanvas = portaCorredorCanvasCoords();
-  return (
-    personagem.x + personagem.width > portaCanvas.x &&
-    personagem.x < portaCanvas.x + portaCanvas.width &&
-    personagem.y + personagem.height > portaCanvas.y &&
-    personagem.y < portaCanvas.y + portaCanvas.height
-  );
+
+}
+function changeBackgroundValues(spriteSourceY, spriteSourceWidth, spriteSourceHeight, width, height, x, y) {
+  background.sprite.sourceY = spriteSourceY;
+  background.sprite.sourceWidth = spriteSourceWidth;
+  background.sprite.sourceHeight = spriteSourceHeight;
+  background.width = width;
+  background.height = height;
+  background.x = x;
+  background.y = y;
 }
