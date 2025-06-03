@@ -32,6 +32,11 @@ var frameWidth = 28; // Largura de cada frame
 var frameHeight = 67; // Altura de cada frame
 var frameDelay = 80; // Número de atualizações antes de mudar o frame
 var frameCounter = 0; // Contador para controlar o atraso
+var isJumping = false;
+var gravity = 0.5;
+var velocityY = 0; // Começa parado
+var jumpStrength = -16; // Valor negativo para "subir"
+var groundY = 420; 
 
 var portaQuarto = new Porta(
   1515,
@@ -107,13 +112,13 @@ function init() {
     requestAnimationFrame(update);
   }, false);
 
-  canvas.addEventListener("mousedown", function(e) {
+  canvas.addEventListener("mousedown", function (e) {
     if (puzzleActive) {
       var rect = canvas.getBoundingClientRect();
       slidePuzzle.handleMouseDown(e.clientX - rect.left, e.clientY - rect.top);
     }
   });
-  canvas.addEventListener("mouseup", function(e) {
+  canvas.addEventListener("mouseup", function (e) {
     if (puzzleActive) {
       var rect = canvas.getBoundingClientRect();
       slidePuzzle.handleMouseUp(e.clientX - rect.left, e.clientY - rect.top);
@@ -123,7 +128,7 @@ function init() {
       }
     }
   });
-  canvas.addEventListener("mousemove", function(e) {
+  canvas.addEventListener("mousemove", function (e) {
     if (puzzleActive) {
       var rect = canvas.getBoundingClientRect();
       slidePuzzle.handleMouseMove(e.clientX - rect.left, e.clientY - rect.top);
@@ -152,7 +157,6 @@ function keyDownHandler(e) {
       isRunning = true; // Define a flag de corrida
       updateSpeed(); // Atualiza a velocidade do personagem
     }
-<<<<<<< HEAD
   }
 
   if (e.code === 'KeyE' && portaCorredor.personagemEmFrente(personagem, canvas) && noCorredor && !portaCorredor.aberta) {
@@ -161,13 +165,13 @@ function keyDownHandler(e) {
     portaCorredor.abrir(); // Fecha a portaCorredor ao voltar para o quarto
     return;
   }
-  
+
   // if (noCorredor && (e.code === "KeyE") && personagemEmFrentePortaCorredor()) {
   //   noCorredor = false;
   //   portaQuarto.aberta = false; // Fecha a portaQuarto ao voltar para o quarto
   //   return;
   // }
-  
+
   if (e.code === "KeyE" && portaQuarto.personagemEmFrente(personagem, canvas) && !noCorredor && !portaQuarto.aberta) {
     portaQuarto.abrir();
     // Troca o fundo e move o personagem
@@ -176,8 +180,7 @@ function keyDownHandler(e) {
     portaQuarto.abrir(); // Fecha a portaCorredor ao voltar para o quarto
     noCorredor ? personagem.x = 1270 : '' // Move o personagem para a esquerda
     // personagem.x = 1270; // Move o personagem para a esquerda
-=======
-<<<<<<< HEAD
+
   }
 
   if (noCorredor && (e.key === "e" || e.key === "E") && personagemEmFrentePortaCorredor()) {
@@ -188,19 +191,17 @@ function keyDownHandler(e) {
   }
 
   if (e.key === "e" || e.key === "E") {
-    if (porta.personagemEmFrente(personagem, canvas) && !porta.aberta) {
-      porta.abrir();
+    if (portaCorredor.personagemEmFrente(personagem, canvas) && !porta.aberta) {
+      portaCorredor.abrir();
       // Troca o fundo e move o personagem
       noCorredor = true;
       personagem.x = 1270; // Move o personagem para o centro da porta
     }
->>>>>>> 629ed8cd58ad8f68518f8e836f596f512faa2833
   }
 }
 
 function keyUpHandler(e) {
   if (!canMove) return;
-<<<<<<< HEAD
   if (e.code === "ArrowRight" || e.code === "ArrowLeft") {
     personagem.vx = 0; // Para o movimento horizontal
   }
@@ -208,21 +209,33 @@ function keyUpHandler(e) {
     if (isRunning) {
       baseSpeed /= 4; // Restaura a velocidade base ao soltar Shift
       isRunning = false; // Limpa a flag de corrida
-=======
-=======
-    
-    function keyUpHandler(e) {
-      if (!canMove) return;
-      if (e.code === "ArrowRight" || e.code === "ArrowLeft") {
-        personagem.vx = 0; // Para o movimento horizontal
+
+      function keyUpHandler(e) {
+        if (!canMove) return;
+        if (e.code === "ArrowRight" || e.code === "ArrowLeft") {
+          personagem.vx = 0; // Para o movimento horizontal
+        }
+        if (e.code === "ShiftLeft") {
+          if (isRunning) {
+            baseSpeed /= 4; // Restaura a velocidade base ao soltar Shift
+            isRunning = false; // Limpa a flag de corrida
+            updateSpeed(); // Atualiza a velocidade do personagem
+          }
+        }
       }
-      if (e.code === "ShiftLeft") {
-        if (isRunning) {
-          baseSpeed /= 4; // Restaura a velocidade base ao soltar Shift
-          isRunning = false; // Limpa a flag de corrida
->>>>>>> 891bb5adac04b62c384db43700b8f62a8e5d0b32
->>>>>>> 629ed8cd58ad8f68518f8e836f596f512faa2833
-      updateSpeed(); // Atualiza a velocidade do personagem
+    }
+  }
+  if (e.code === "ArrowUp") {
+    if (isAwakePlaying) {
+      // Se o personagem está acordando, não permite movimento
+      return;
+    }
+
+
+    // Gravity and jump logic
+    if (e.code === "ArrowUp" && !isJumping && !isAwakePlaying) {
+      isJumping = true;
+      velocityY = jumpStrength;
     }
   }
 }
@@ -231,6 +244,19 @@ function update() {
   if (canMove) {
     personagem.x += personagem.vx;
     personagem.y += personagem.vy;
+
+     // Lógica do pulo
+    if (isJumping) {
+      velocityY += gravity;
+      personagem.y += velocityY;
+
+      // Chegou ao chão?
+      if (personagem.y >= groundY) {
+        personagem.y = groundY;
+        velocityY = 0;
+        isJumping = false;
+      }
+    }
   }
 
   // Impede que o personagem saia do canvas
@@ -512,11 +538,8 @@ function portaCorredorCanvasCoords() {
   };
 }
 
-<<<<<<< HEAD
-=======
 function personagemEmFrentePortaCorredor() {
   var portaCanvas = portaCorredorCanvasCoords();
-<<<<<<< HEAD
   return (
     personagem.x + personagem.width > portaCanvas.x &&
     personagem.x < portaCanvas.x + portaCanvas.width &&
@@ -529,10 +552,9 @@ function tocarSomPorta() {
   var audio = document.getElementById("doorSound");
   audio.currentTime = 0;
   audio.play();
-=======
 
 }
->>>>>>> 629ed8cd58ad8f68518f8e836f596f512faa2833
+
 function changeBackgroundValues(spriteSourceY, spriteSourceWidth, spriteSourceHeight, width, height, x, y) {
   background.sprite.sourceY = spriteSourceY;
   background.sprite.sourceWidth = spriteSourceWidth;
@@ -541,5 +563,4 @@ function changeBackgroundValues(spriteSourceY, spriteSourceWidth, spriteSourceHe
   background.height = height;
   background.x = x;
   background.y = y;
->>>>>>> 891bb5adac04b62c384db43700b8f62a8e5d0b32
 }
