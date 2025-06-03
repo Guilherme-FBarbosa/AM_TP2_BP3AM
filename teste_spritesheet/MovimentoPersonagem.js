@@ -29,6 +29,8 @@ var frameWidth = 28; // Largura de cada frame
 var frameHeight = 67; // Altura de cada frame
 var frameDelay = 80; // Número de atualizações antes de mudar o frame
 var frameCounter = 0; // Contador para controlar o atraso
+let camera;
+let gameWorld;
 
 porta = new Porta(
   1515,
@@ -51,6 +53,13 @@ function init() {
   personagem.x = 160;
   personagem.y = canvas.height / 2 - 50;
   sprites.push(personagem);
+
+  gameWorld = new GameWorld(0, 0, canvas.width, canvas.height);
+  
+  // Inicializa a câmera
+  camera = new Camera(0, 0, canvas.width/2, canvas.height/2);
+
+  camera.center(gameWorld);
 
   awakeImage = new Image();
   awakeImage.src = "assets/Awake.png";
@@ -80,6 +89,8 @@ function init() {
     window.addEventListener("keyup", keyUpHandler, false);
     requestAnimationFrame(update);
   }, false);
+
+ 
 }
 
 function keyDownHandler(e) {
@@ -239,6 +250,17 @@ function update() {
       frameIndex = frameIndex % frameCount;
     }
   }
+  // Center the camera on the game world
+  camera.keepWithinWorld(gameWorld, personagem);
+
+  //mover o personagem e mante-lo dentro do mundo
+  personagem.x = Math.max(0, Math.min(personagem.x + personagem.vx, gameWorld.sprite.sourceWidth - personagem.width)); 
+  personagem.y = Math.max(0, Math.min(personagem.y + personagem.vy, gameWorld.sprite.sourceHeight - personagem.height));
+  
+   
+  //Mover the camera
+  camera.x = Math.floor(personagem.x + (personagem.width / 2) - (camera.width / 2));
+  camera.y = Math.floor(personagem.y + (personagem.height / 2) - (camera.height / 2));
 
   requestAnimationFrame(update, canvas);
   render();
@@ -283,7 +305,11 @@ function render() {
     for (var i = 0; i < sprites.length; i++) {
       var entity = sprites[i];
       if (entity.visible) {
+
         drawingSurface.save(); // Salva o estado atual do contexto
+
+        // transladar a drawing surface e mante-la posicionada relativamente � camara
+        drawingSurface.translate(-camera.x, -camera.y);
 
         if (!facingRight) {
           // Espelha a imagem horizontalmente
@@ -305,7 +331,8 @@ function render() {
             entity.width, entity.height // Tamanho no canvas
           );
         }
-
+        // Draw the camera frame
+        camera.drawFrame(drawingSurface, false);
         drawingSurface.restore(); // Restaura o estado do contexto
       }
     }
